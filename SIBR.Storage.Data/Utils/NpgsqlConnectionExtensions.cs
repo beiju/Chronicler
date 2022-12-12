@@ -4,6 +4,7 @@ using Dapper;
 using Npgsql;
 using SqlKata;
 using SqlKata.Compilers;
+using System;
 
 namespace SIBR.Storage.Data.Utils
 {
@@ -29,8 +30,9 @@ namespace SIBR.Storage.Data.Utils
         public static async IAsyncEnumerable<T> QueryKataAsync<T>(this NpgsqlConnection conn, SqlKata.Query query)
         {
             var compiled = new PostgresCompiler().Compile(query);
+            Console.WriteLine(compiled.Sql);
             await using var reader = await conn.ExecuteReaderAsync(compiled.Sql, compiled.NamedBindings);
-            
+
             var parser = reader.GetRowParser<T>();
             while (await reader.ReadAsync())
                 yield return parser(reader); 
